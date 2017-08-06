@@ -12,8 +12,10 @@
   "dependencies": {
     "body-parser": "^1.17.2",
     "express": "^4.15.3",
+    "google-home-notifier": "^1.0.0",
     "hs100-api": "^0.4.0",
     "morgan": "^1.8.2",
-    "philips-hue": "^1.2.0"
+    "philips-hue": "^1.2.0",
+    "request": "^2.81.0"
   }
 }

@@ -5,11 +5,15 @@ const express = require("express");
 const app = express();
 
 const goodnight= require("./routes/goodnight");
+const twitch= require("./routes/twitch");
+
 
 app.use(bodyParser.json());
 app.use(morgan("short"));
 
 app.use(goodnight);
+app.use(twitch);
+
 
 app.use((req, res, next) => {
   res.sendStatus(404);
