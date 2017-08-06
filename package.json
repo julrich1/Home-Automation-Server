@@ -1,0 +1,19 @@
+{
+  "name": "home-automation-server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.17.2",
+    "express": "^4.15.3",
+    "hs100-api": "^0.4.0",
+    "morgan": "^1.8.2",
+    "philips-hue": "^1.2.0"
+  }
+}
