@@ -23,10 +23,13 @@ const streamersMap = {
   "sgdq": "gamesdonequick"
 };
 
-function castStreamer(streamerName) {
-  streamerName = streamerName.toLowerCase();
-  streamerName = streamersMap[streamerName];
-  if (streamerName === undefined) { return google("No streamers were found with that name"); }
+function castStreamer(sName) {
+  sName = sName.toLowerCase();
+  const streamerName = streamersMap[sName];
+  if (streamerName === undefined) {
+    exec(`echo ${sName} >> output.txt`);
+    return google("No streamers were found with that name");
+  }
 
   exec(`livestreamer twitch.tv/${streamerName} best --http-header=Client-ID=jzkbprff40iqj646a697cyrvl0zt2m6 --player-passthrough=http,hls,rtmp -j`, (err, stdout, stderr) => {
     castUrl(JSON.parse(stdout).url);
@@ -34,7 +37,7 @@ function castStreamer(streamerName) {
 }
 
 function castUrl(url) {
-  const browser = mdns.createBrowser(mdns.tcp('googlecast'));
+  const browser = mdns.createBrowser(mdns.tcp("googlecast"));
 
   browser.on("serviceUp", function(service) {
     if (service.txtRecord.fn === CHROMECAST_NAME) {
@@ -59,7 +62,7 @@ function ondeviceup(host, url) {
       };
       
       player.load(media, { autoplay: true }, function(err, status) {
-        console.log('Media Loaded playerState=%s', status.playerState);
+        console.log("Media Loaded playerState=%s", status.playerState);
         client.close();
       });
     });
