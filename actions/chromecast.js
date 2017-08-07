@@ -31,7 +31,7 @@ function castStreamer(sName) {
     return google("No streamers were found with that name");
   }
 
-  exec(`livestreamer twitch.tv/${streamerName} best --http-header=Client-ID=jzkbprff40iqj646a697cyrvl0zt2m6 --player-passthrough=http,hls,rtmp -j`, (err, stdout, stderr) => {
+  exec(`livestreamer twitch.tv/${streamerName} best --http-header=Client-ID=jzkbprff40iqj646a697cyrvl0zt2m6 --player-passthrough=http,hls,rtmp -j --yes-run-as-root`, (err, stdout, stderr) => {
     castUrl(JSON.parse(stdout).url);
   });
 }
