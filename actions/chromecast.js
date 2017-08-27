@@ -20,7 +20,8 @@ const streamersMap = {
   "this on off": "disnof",
   "diss nas": "disnof",
   "agdq": "gamesdonequick",
-  "sgdq": "gamesdonequick"
+  "sgdq": "gamesdonequick",
+  "santo": "santzo84"
 };
 
 function castStreamer(sName) {
@@ -37,6 +38,10 @@ function castStreamer(sName) {
 }
 
 function castUrl(url) {
+  if (!url) {
+    return google("Streamer not online");
+  }
+  
   const browser = mdns.createBrowser(mdns.tcp("googlecast"));
 
   browser.on("serviceUp", function(service) {
