@@ -67,7 +67,7 @@ function ondeviceup(host, url) {
       };
       
       player.load(media, { autoplay: true }, function(err, status) {
-        console.log("Media Loaded playerState=%s", status.playerState);
+        if (status) { console.log("Media Loaded playerState=%s", status.playerState); }
         client.close();
       });
     });
