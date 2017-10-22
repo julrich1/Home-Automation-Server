@@ -55,7 +55,9 @@ function getStreamInfo(streamer) {
       const data = JSON.parse(body);
       
       if (data.streams) {
-        return resolve(streamer);
+        if (data.streams.length) {
+          return resolve(streamer);
+        }
       }
       return resolve(null);
     });
