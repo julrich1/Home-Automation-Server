@@ -52,7 +52,9 @@ function getStreamInfo(streamer) {
   return new Promise((resolve, reject) => {
     request(`https://api.twitch.tv/kraken/streams?client_id=${TWITCH_API_KEY}&channel=${streamer}`, (err, res, body) => {
       if (err) { return reject(err); }
-      if (JSON.parse(body).streams.length) {
+      const data = JSON.parse(body);
+      
+      if (data.streams) {
         return resolve(streamer);
       }
       return resolve(null);
