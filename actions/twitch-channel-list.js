@@ -2,64 +2,84 @@ const request = require("request");
 const google = require("./google-home-notifier");
 
 const TWITCH_API_KEY = require("../API_KEYS/twitch_api_keys.js");
-const TWITCH_USER = "shadowgate";
+const TWITCH_USER_ID = "8095777";
 
-let onlineList = "";
+const FOLLOWED_STREAMERS_URL = `https://api.twitch.tv/helix/users/follows?from_id=${TWITCH_USER_ID}&first=100`;
+const ONLINE_STREAMERS_URL = "https://api.twitch.tv/helix/streams";
+const USER_DETAILS_URL = "https://api.twitch.tv/helix/users";
 
 function getChannelList() {
-  const onlineUrl = `https://api.twitch.tv/kraken/users/${TWITCH_USER}/follows/channels?client_id=${TWITCH_API_KEY}`;
+  const HEADERS =  { "Client-ID": TWITCH_API_KEY };
 
-  const followedStreamers = [];
+  const httpRequest = {
+    url: FOLLOWED_STREAMERS_URL,
+    headers: HEADERS
+  };
 
-  request(onlineUrl, (err, res, body) => {
+  request(httpRequest, (err, res, body) => {
     if (err) { 
       google("There was an error getting info from Twitch");
       return console.log(err); 
     }
 
-    let i = 0;
-    for (const streamer of JSON.parse(body).follows) {
-      followedStreamers[i++] = streamer.channel.name;
+    let streamerIds = "";
+    const streamers = JSON.parse(body).data;
+    for (const streamer of streamers) {
+      streamerIds += "user_id=" + streamer.to_id + "&"
     }
 
-    let promises = [];
-    
-    for (const streamer of followedStreamers) {
-      promises.push(getStreamInfo(streamer));
+    const httpRequest = {
+      url: `${ONLINE_STREAMERS_URL}?${streamerIds}`,
+      headers: HEADERS
     }
 
-    Promise.all(promises)
-      .then((result) => {
-        onlineList = result.reduce((streamers, streamer) => {
-          if (streamer) { streamers += `${streamer}, `; }
-          return streamers;
-        }, "");
+    let onlineIds = "";
 
-        if (onlineList.length < 1) { onlineList = "Nobody is online"; }
-        else if (onlineList.length < 2) { onlineList += "is online"; }
-        else { onlineList += "are online"; }
-
-        google(onlineList);
-      })
-      .catch((err) => {
-        console.log(err);
+    request(httpRequest, (err, res, body) => {
+      if (err) { 
         google("There was an error getting info from Twitch");
-      });
-  });
-}
-
-function getStreamInfo(streamer) {
-  return new Promise((resolve, reject) => {
-    request(`https://api.twitch.tv/kraken/streams?client_id=${TWITCH_API_KEY}&channel=${streamer}`, (err, res, body) => {
-      if (err) { return reject(err); }
-      const data = JSON.parse(body);
-      
-      if (data.streams) {
-        if (data.streams.length) {
-          return resolve(streamer);
-        }
+        return console.log(err); 
       }
-      return resolve(null);
+
+      const streamers = JSON.parse(body).data;
+      if (streamers.length === 0) {
+        return google("Nobody is online");
+      }
+
+      const onlineCount = streamers.length; 
+
+      for (const streamer of streamers) {
+        onlineIds += "id=" + streamer.user_id + "&";
+      }
+
+      const httpRequest = {
+        url: `${USER_DETAILS_URL}?${onlineIds}`,
+        headers: HEADERS
+      };
+
+      let onlineStreamers = "";
+
+      request(httpRequest, (err, res, body) => {
+        if (err) { 
+          google("There was an error getting info from Twitch");
+          return console.log(err); 
+        }
+
+        const streamers = JSON.parse(body).data;
+        for (const streamer of streamers) {
+          onlineStreamers += streamer.display_name + ", ";
+        }
+
+        if (onlineCount === 1) {
+          onlineStreamers += "is online";
+        }
+        else {
+          onlineStreamers += "are online";
+        }
+        console.log("Online streamers: " + onlineStreamers);
+
+        google(onlineStreamers);
+      }); 
     });
   });
 }
