@@ -10,6 +10,7 @@ const app = express();
 const goodnight= require("./routes/goodnight");
 const twitch = require("./routes/twitch");
 const cast = require("./routes/cast");
+const volume = require("./routes/volume");
 
 app.use(bodyParser.json());
 app.use(morgan("short"));
@@ -17,6 +18,7 @@ app.use(morgan("short"));
 app.use(goodnight);
 app.use(twitch);
 app.use(cast);
+app.use(volume);
 
 app.use((req, res, next) => {
   res.sendStatus(404);

@@ -17,10 +17,4 @@ router.get("/goodnight", (req, res, next) => {
   res.send("Goodnight"); 
 });
 
-// router.get("/goodnight/stop", (req, res, next) => {
-//   noiseMachine(false);
-//   clearInterval(dimTimer);
-//   res.send("Stop");
-// });
-
 module.exports = router;
