@@ -82,7 +82,9 @@ function stopDevice(host) {
   let client = new Client();
   
   client.connect(host, function() {
-    client.receiver.stop()
+    client.receiver.stop(sessionId, () => {
+      console.log("Stopping chromecast");
+    });
   });
 }
 
