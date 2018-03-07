@@ -7,6 +7,8 @@ const mdns = require("mdns");
 
 const CHROMECAST_NAME = "Living Room";
 
+let storedURL;
+
 const streamersMap = {
   "cobalt streak": "cobaltstreak",
   "lobos": "lobosjr",
@@ -42,6 +44,8 @@ function castUrl(url) {
     return google("Streamer not online");
   }
   
+  storedURL = url;
+
   const browser = mdns.createBrowser(mdns.tcp("googlecast"));
 
   browser.on("serviceUp", function(service) {
@@ -74,4 +78,44 @@ function ondeviceup(host, url) {
   });
 }
 
-module.exports = castStreamer;
+function stopDevice(host) {
+  let client = new Client();
+  
+  client.connect(host, function() {
+    client.receiver.stop()
+  });
+}
+
+function swapChromecasts() {
+  const PRIMARY_CHROMECAST = "Living Room";
+  const SECONDARY_CHROMECAST = "Kitchen";
+  const browser = mdns.createBrowser(mdns.tcp("googlecast"));
+
+  var idleCC;
+  var nonIdleCC;
+
+  browser.on("serviceUp", function(service) {
+    if (service.txtRecord.fn === PRIMARY_CHROMECAST || service.txtRecord.fn === SECONDARY_CHROMECAST) {
+      console.log("Found Device \"%s\" at %s:%d", service.name, service.addresses[0], service.port, service.txtRecord.fn, service);
+      if (service.txtRecord.rs === "Ready to play" || service.txtRecord.rs === "Now Casting") {
+        nonIdleCC = service.addresses[0];
+      }
+
+      if (service.txtRecord.rs === "") {
+        idleCC = service.addresses[0];
+      }
+
+      console.log("Values are: " + idleCC +  nonIdleCC);
+      if (idleCC && nonIdleCC) {
+        ondeviceup(idleCC, storedURL);
+        stopDevice(nonIdleCC);
+      } 
+    }
+
+    browser.stop();
+  });
+
+  browser.start();  
+}
+
+module.exports = { castStreamer, swapChromecasts }; 

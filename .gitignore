@@ -2,3 +2,4 @@ node_modules
 API_KEYS 
 cert.pem
 key.pem
+.vscode
