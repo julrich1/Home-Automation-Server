@@ -82,7 +82,7 @@ function stopDevice(host) {
   let client = new Client();
   
   client.connect(host, function() {
-    client.receiver.stop(sessionId, () => {
+    client.receiver.stop(1, () => {
       console.log("Stopping chromecast");
     });
   });
@@ -107,7 +107,6 @@ function swapChromecasts() {
         idleCC = service.addresses[0];
       }
 
-      console.log("Values are: " + idleCC +  nonIdleCC);
       if (idleCC && nonIdleCC) {
         ondeviceup(idleCC, storedURL);
         stopDevice(nonIdleCC);
