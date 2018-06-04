@@ -5,7 +5,7 @@ const Client = require("castv2-client").Client;
 const DefaultMediaReceiver = require("castv2-client").DefaultMediaReceiver;
 const mdns = require("mdns");
 
-const CHROMECAST_NAME = "Living Room";
+const CHROMECAST_NAME = "Living Room Chromecast";
 
 let storedURL;
 
