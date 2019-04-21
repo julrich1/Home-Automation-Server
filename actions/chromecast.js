@@ -5,9 +5,7 @@ const Client = require("castv2-client").Client;
 const DefaultMediaReceiver = require("castv2-client").DefaultMediaReceiver;
 const mdns = require("mdns");
 
-const CHROMECAST_NAME = "Living Room TV";
-
-let storedURL;
+const CHROMECAST_IP = "196.168.86.92";
 
 const streamersMap = {
   "cobalt streak": "cobaltstreak",
@@ -35,6 +33,7 @@ function castStreamer(sName) {
   }
 
   exec(`livestreamer twitch.tv/${streamerName} best --http-header=Client-ID=jzkbprff40iqj646a697cyrvl0zt2m6 --player-passthrough=http,hls,rtmp -j --yes-run-as-root`, (err, stdout, stderr) => {
+    console.log("Casting URL: " + JSON.parse(stdout).url);
     castUrl(JSON.parse(stdout).url);
   });
 }
@@ -43,20 +42,7 @@ function castUrl(url) {
   if (!url) {
     return google("Streamer not online");
   }
-  
-  storedURL = url;
-
-  const browser = mdns.createBrowser(mdns.tcp("googlecast"));
-
-  browser.on("serviceUp", function(service) {
-    if (service.txtRecord.fn === CHROMECAST_NAME) {
-      console.log("Found Device \"%s\" at %s:%d", service.name, service.addresses[0], service.port, service.txtRecord.fn);
-      ondeviceup(service.addresses[0], url);
-    }
-    browser.stop();
-  });
-
-  browser.start();
+  ondeviceup("192.168.86.92", url);
 }
 
 function ondeviceup(host, url) {
@@ -78,45 +64,4 @@ function ondeviceup(host, url) {
   });
 }
 
-function stopDevice(host) {
-  let client = new Client();
-  
-  client.connect(host, function() {
-    client.receiver.stop(1, () => {
-      console.log("Stopping chromecast");
-    });
-  });
-}
-
-function swapChromecasts() {
-  const PRIMARY_CHROMECAST = "Living Room";
-  const SECONDARY_CHROMECAST = "Kitchen";
-  const browser = mdns.createBrowser(mdns.tcp("googlecast"));
-
-  var idleCC;
-  var nonIdleCC;
-
-  browser.on("serviceUp", function(service) {
-    if (service.txtRecord.fn === PRIMARY_CHROMECAST || service.txtRecord.fn === SECONDARY_CHROMECAST) {
-      console.log("Found Device \"%s\" at %s:%d", service.name, service.addresses[0], service.port, service.txtRecord.fn, service);
-      if (service.txtRecord.rs === "Ready to play" || service.txtRecord.rs === "Now Casting") {
-        nonIdleCC = service.addresses[0];
-      }
-
-      if (service.txtRecord.rs === "") {
-        idleCC = service.addresses[0];
-      }
-
-      if (idleCC && nonIdleCC) {
-        ondeviceup(idleCC, storedURL);
-        stopDevice(nonIdleCC);
-      } 
-    }
-
-    browser.stop();
-  });
-
-  browser.start();  
-}
-
-module.exports = { castStreamer, swapChromecasts }; 
+module.exports = { castStreamer }; 
