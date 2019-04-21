@@ -3,9 +3,8 @@ const exec = require("child_process").exec;
 
 const Client = require("castv2-client").Client;
 const DefaultMediaReceiver = require("castv2-client").DefaultMediaReceiver;
-const mdns = require("mdns");
 
-const CHROMECAST_IP = "196.168.86.92";
+const CHROMECAST_IP = "192.168.86.92";
 
 const streamersMap = {
   "cobalt streak": "cobaltstreak",
@@ -32,7 +31,7 @@ function castStreamer(sName) {
     return google("No streamers were found with that name");
   }
 
-  exec(`livestreamer twitch.tv/${streamerName} best --http-header=Client-ID=jzkbprff40iqj646a697cyrvl0zt2m6 --player-passthrough=http,hls,rtmp -j --yes-run-as-root`, (err, stdout, stderr) => {
+  exec(`streamlink twitch.tv/${streamerName} best --http-header=Client-ID=jzkbprff40iqj646a697cyrvl0zt2m6 --player-passthrough=http,hls,rtmp -j`, (err, stdout, stderr) => {
     console.log("Casting URL: " + JSON.parse(stdout).url);
     castUrl(JSON.parse(stdout).url);
   });
@@ -42,13 +41,9 @@ function castUrl(url) {
   if (!url) {
     return google("Streamer not online");
   }
-  ondeviceup("192.168.86.92", url);
-}
 
-function ondeviceup(host, url) {
   let client = new Client();
-
-  client.connect(host, function() {
+  client.connect(CHROMECAST_IP, function() {
     client.launch(DefaultMediaReceiver, function(err, player) {
       const media = {
         contentId: url,
