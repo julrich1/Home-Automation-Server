@@ -10,14 +10,14 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "body-parser": "^1.17.2",
+    "body-parser": "^1.18.3",
     "castv2-client": "^1.2.0",
-    "chromecasts": "^1.9.0",
-    "express": "^4.15.3",
-    "google-home-notifier": "^1.0.0",
+    "chromecasts": "^1.9.1",
+    "express": "^4.16.4",
+    "google-home-notifier": "^1.2.0",
     "hs100-api": "^0.4.0",
-    "morgan": "^1.8.2",
+    "morgan": "^1.9.1",
     "philips-hue": "^1.2.0",
-    "request": "^2.81.0"
+    "request": "^2.88.0"
   }
 }
